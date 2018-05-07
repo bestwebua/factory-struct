@@ -7,7 +7,7 @@ end
 class Factory
   include Enumerable
 
-  def self.new(*args)
+  def self.new(*args, &block)
     constant, params = args[0], args[1..-1]
 
     case
@@ -20,7 +20,7 @@ class Factory
     end
 
       temp_class = Class.new Factory do
-
+        
       end
 
     constant.nil? ? temp_class : const_set(constant, temp_class)
