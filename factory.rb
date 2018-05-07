@@ -19,7 +19,7 @@ class Factory
         raise TypeError, "#{class_args[0]} is not a symbol"
     end
 
-    temp_class = Class.new do # need to add inheritance from Factory class, exception method .new
+    subclass = Class.new do # need to add inheritance from Factory class, exception method .new
       attr_accessor *class_args
 
       define_method :initialize do |*args|
@@ -29,7 +29,7 @@ class Factory
       end
     end
 
-    constant.nil? ? temp_class : const_set(constant, temp_class)
+    constant.nil? ? subclass : const_set(constant, subclass)
   end
 
 end
