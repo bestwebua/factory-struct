@@ -76,6 +76,8 @@ class Factory
         instance_variables.map { |instance_var| instance_var.to_s.delete('@') }
       end
 
+      alias :size :length
+
       private :attributes
 
     end
