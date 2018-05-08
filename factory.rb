@@ -32,22 +32,18 @@ class Factory
         self.class == other.class && self.values == other.values
       end
 
+      define_method(:[]) do |arg|
+        arg.is_a?(Fixnum) ? send(attributes[arg]) : send(arg)
+      end
+
       define_method(:each) do |&block|
         return enum_for(:each) unless block
-
-        self.values.each do |value|
-          block.call(value)
-        end
+        attributes { |attribute| block.call(send(attribute)) }
       end
 
       define_method(:each_pair) do |&block|
         return enum_for(:each) unless block
-
-        accessor_value = instance_variables.map { |var| var.to_s.delete('@') }.zip(self.values)
-
-        accessor_value.each do |accessor, value|
-          block.call(accessor, value)
-        end
+        attributes.each { |attribute| block.call(attribute, send(attribute)) }
       end
 
       define_method(:eql?) do |other|
@@ -55,8 +51,14 @@ class Factory
       end
 
       define_method(:values) do
-        instance_variables.map { |accessor| instance_variable_get(accessor) }
+        attributes.map { |attribute| send(attribute) }
       end
+
+      define_method(:attributes) do
+        instance_variables.map { |instance_var| instance_var.to_s.delete('@') }
+      end
+
+      private :attributes
 
     end
 
