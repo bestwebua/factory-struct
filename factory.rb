@@ -32,6 +32,10 @@ class Factory
         self.class == other.class && self.values == other.values
       end
 
+      define_method(:[]) do |arg|
+        arg.is_a?(Fixnum) ? send(attributes[arg]) : send(arg)
+      end
+
       define_method(:each) do |&block|
         return enum_for(:each) unless block
         attributes { |attribute| block.call(send(attribute)) }
