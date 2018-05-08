@@ -5,7 +5,6 @@ class String
 end
 
 class Factory
-  include Enumerable
 
   def self.new(*args)
     constant = args[0].is_a?(String) && args[0].is_a_const? ? args[0] : nil
@@ -20,6 +19,7 @@ class Factory
     end
 
     subclass = Class.new do
+      include Enumerable
       attr_accessor *class_args
 
       define_method(:initialize) do |*args|
@@ -30,14 +30,40 @@ class Factory
 
       define_method(:each) do |&block|
         return enum_for(:each) unless block
-        
-        class_args.each do |accessor|
-          block.call(public_send("#{accessor}"))
+
+        instance_variables.each do |accessor|
+          block.call(instance_variable_get(accessor))
         end
       end
+
+      define_method(:each_pair) do |&block|
+        return enum_for(:each) unless block
+
+        accessor_value = instance_variables.map do |accessor|
+          [accessor.to_s.delete('@'), instance_variable_get(accessor)]
+        end
+
+        accessor_value.each do |accessor, value|
+          block.call(accessor, value)
+        end
+      end
+
     end
 
     constant.nil? ? subclass : const_set(constant, subclass)
 
   end
 end
+
+
+=begin
+
+      define_method(:each_pair) do |&block|
+        return enum_for(:each) unless block
+        
+        .each do |accessor, value|
+          block.call(accessor, value)
+        end
+      end
+
+=end
