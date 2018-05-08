@@ -35,17 +35,15 @@ class Factory
       define_method(:each) do |&block|
         return enum_for(:each) unless block
 
-        instance_variables.each do |accessor|
-          block.call(instance_variable_get(accessor))
+        self.values.each do |value|
+          block.call(value)
         end
       end
 
       define_method(:each_pair) do |&block|
         return enum_for(:each) unless block
 
-        accessor_value = instance_variables.map do |accessor|
-          [accessor.to_s.delete('@'), instance_variable_get(accessor)]
-        end
+        accessor_value = instance_variables.map { |var| var.to_s.delete('@') }.zip(self.values)
 
         accessor_value.each do |accessor, value|
           block.call(accessor, value)
