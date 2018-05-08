@@ -77,7 +77,8 @@ class Factory
       end
 
       alias :size :length
-
+      alias :to_a :values
+      
       private :attributes
 
     end
