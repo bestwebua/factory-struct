@@ -76,6 +76,17 @@ class Factory
         attributes.map { |attribute| send(attribute) }
       end
 
+      define_method(:values_at) do |from, to|
+        result = values.values_at(from, to)
+        error = case
+            when result.first.nil? then "offset #{from} too small"
+            when result.last.nil? then "offset #{to} too large"
+        end
+        
+        raise IndexError, error + " for factory(size:#{size})" if result.any?(&:nil?)
+        result
+      end
+
       define_method(:attributes) do
         instance_variables.map { |instance_var| instance_var.to_s.delete('@').to_sym }
       end
