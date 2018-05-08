@@ -82,6 +82,7 @@ class Factory
 
       alias :size :length
       alias :to_a :values
+      alias :to_s :inspect
       
       private :attributes
 
