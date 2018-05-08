@@ -19,6 +19,7 @@ class Factory
     end
 
     subclass = Class.new do
+
       include Enumerable
       attr_accessor *class_args
 
@@ -34,6 +35,10 @@ class Factory
 
       define_method(:[]) do |arg|
         arg.is_a?(Fixnum) ? send(attributes[arg]) : send(arg)
+      end
+
+      define_method(:[]=) do |attribute, value|
+        instance_variable_set(attribute.to_s.insert(0, '@').to_sym, value)
       end
 
       define_method(:each) do |&block|
