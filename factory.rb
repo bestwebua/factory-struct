@@ -50,6 +50,10 @@ class Factory
         end
       end
 
+      define_method(:eql?) do |other|
+        self.class == other.class && (self.values).eql?(other.values)
+      end
+
       define_method(:values) do
         instance_variables.map { |accessor| instance_variable_get(accessor) }
       end
