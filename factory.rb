@@ -28,6 +28,10 @@ class Factory
         class_args.zip(subclass_args).each { |accessor, value| public_send("#{accessor}=", value) }
       end
 
+      define_method(:==) do |other|
+        self.class == other.class && self.values == other.values
+      end
+
       define_method(:each) do |&block|
         return enum_for(:each) unless block
 
