@@ -58,16 +58,3 @@ class Factory
 
   end
 end
-
-
-=begin
-
-      define_method(:each_pair) do |&block|
-        return enum_for(:each) unless block
-        
-        .each do |accessor, value|
-          block.call(accessor, value)
-        end
-      end
-
-=end
