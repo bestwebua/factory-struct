@@ -68,6 +68,10 @@ class Factory
         values.select(&block)
       end
 
+      define_method(:to_h) do
+        attributes.map(&:to_sym).zip(values).to_h
+      end
+
       define_method(:values) do
         attributes.map { |attribute| send(attribute) }
       end
