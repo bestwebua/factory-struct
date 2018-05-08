@@ -55,6 +55,10 @@ class Factory
         self.class == other.class && (self.values).eql?(other.values)
       end
 
+      define_method(:length)
+        attributes.size
+      end
+
       define_method(:values) do
         attributes.map { |attribute| send(attribute) }
       end
