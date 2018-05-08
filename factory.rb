@@ -34,20 +34,12 @@ class Factory
 
       define_method(:each) do |&block|
         return enum_for(:each) unless block
-
-        self.values.each do |value|
-          block.call(value)
-        end
+        self.values.each { |value| block.call(value) }
       end
 
       define_method(:each_pair) do |&block|
         return enum_for(:each) unless block
-
-        accessor_value = instance_variables.map { |var| var.to_s.delete('@') }.zip(self.values)
-
-        accessor_value.each do |accessor, value|
-          block.call(accessor, value)
-        end
+        accessor_value.each { |accessor, value| block.call(accessor, value) }
       end
 
       define_method(:eql?) do |other|
@@ -57,6 +49,12 @@ class Factory
       define_method(:values) do
         instance_variables.map { |accessor| instance_variable_get(accessor) }
       end
+
+      define_method(:accessor_value) do
+        instance_variables.map { |var| var.to_s.delete('@') }.zip(self.values)
+      end
+
+      private :accessor_value
 
     end
 
