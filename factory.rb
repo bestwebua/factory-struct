@@ -63,6 +63,11 @@ class Factory
         attributes.map(&:to_sym)
       end
 
+      define_method(:select) do |&block|
+        return enum_for(:select) unless block
+        values.select(&block)
+      end
+
       define_method(:values) do
         attributes.map { |attribute| send(attribute) }
       end
