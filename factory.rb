@@ -43,7 +43,7 @@ class Factory
 
       define_method(:each) do |&block|
         return enum_for(:each) unless block
-        attributes { |attribute| block.call(send(attribute)) }
+        attributes.each { |attribute| block.call(send(attribute)) }
       end
 
       define_method(:each_pair) do |&block|
@@ -60,7 +60,7 @@ class Factory
       end
 
       define_method(:members) do
-        attributes.map(&:to_sym)
+        attributes
       end
 
       define_method(:select) do |&block|
@@ -69,7 +69,7 @@ class Factory
       end
 
       define_method(:to_h) do
-        attributes.map(&:to_sym).zip(values).to_h
+        attributes.zip(values).to_h
       end
 
       define_method(:values) do
@@ -77,7 +77,7 @@ class Factory
       end
 
       define_method(:attributes) do
-        instance_variables.map { |instance_var| instance_var.to_s.delete('@') }
+        instance_variables.map { |instance_var| instance_var.to_s.delete('@').to_sym }
       end
 
       alias :size :length
