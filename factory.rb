@@ -59,6 +59,10 @@ class Factory
         attributes.size
       end
 
+      define_method(:members) do
+        attributes.map(&:to_sym)
+      end
+
       define_method(:values) do
         attributes.map { |attribute| send(attribute) }
       end
