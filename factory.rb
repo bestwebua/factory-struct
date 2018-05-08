@@ -52,6 +52,10 @@ class Factory
         end
       end
 
+      define_method(:values) do
+        instance_variables.map { |accessor| instance_variable_get(accessor) }
+      end
+
     end
 
     constant.nil? ? subclass : const_set(constant, subclass)
