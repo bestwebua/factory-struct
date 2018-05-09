@@ -45,13 +45,11 @@ class Factory
 
       define_method(:[]=) do |arg, value|
         self[arg]
-
         attribute = if arg.is_a?(Integer)
           attributes[arg].to_s.insert(0, '@').to_sym
         else
           arg.to_s.insert(0, '@').to_sym
         end
-
         instance_variable_set(attribute, value)
       end
 
