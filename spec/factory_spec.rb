@@ -64,7 +64,6 @@ describe Factory do
       subject(:with_args_equal_vars_by_quantity) { base_case.size }
       subject(:with_args_more_vars_by_quantity)  { @factory_object.new(1, 2, 3) }
 
-
       it 'should fill out all values of instance variables with nil' do
         expect(without_args).to eq(true)
       end
@@ -85,6 +84,66 @@ describe Factory do
         expect(base_case).to eq([1, 2])
       end
     end
+  end
+
+  describe 'Factory::Test' do
+
+    subject(:item) { @factory_object.new(1, 2) }
+
+    describe '#==' do
+
+      subject(:item1) { item }
+      subject(:item2) { @factory_object.new(1, 2.0)}
+      
+      it 'return true' do
+        expect(item1 == item).to eq(true)
+      end
+
+      it 'return true' do
+        expect(item1 == item2).to eq(true)
+      end
+    end
+
+    describe '#[]' do
+      it 'factory[member] should return object' do
+        expect(item[:a]).to eq(1)
+      end
+
+      it 'should raise NameError if the member does not exist' do
+        expect { item[:c] }.to raise_error(NameError)
+      end
+
+      it 'factory[index] should return object' do
+        expect(item[1]).to eq(2)
+      end
+
+      it 'should raise IndexError if the index is out of range' do
+        expect { item[2] }.to raise_error(IndexError)
+      end
+    end
+
+    describe '#[]=' do
+      subject(:change_by_key)   { @factory_object.new(1, 2)[:a] = 100 }
+      subject(:change_by_index) { @factory_object.new(1, 2)[1] = 200 }
+
+      it 'factory[member]= should change value' do
+        expect(change_by_key).to eq(100)
+      end
+
+      it 'should raise NameError if the member does not exist' do
+        expect { item[:c] }.to raise_error(NameError)
+      end
+
+      it 'factory[index]= should change value' do
+        expect(change_by_index).to eq(200)
+      end
+
+      it 'should raise IndexError if the index is out of range' do
+        expect { item[2] }.to raise_error(IndexError)
+      end
+    end
+
+
   end
 
 end
