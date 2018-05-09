@@ -143,6 +143,23 @@ describe Factory do
       end
     end
 
+    describe '#dig' do
+      subject(:nested_object) { Factory.new(:id, :position).new(1, 'PR') }
+      subject(:top_object)    { Factory.new(:company, :worker).new('SecretCompany', nested_object) }
+
+      it 'should extract the nested value specified by the sequence of key objects' do
+        expect(top_object.dig(:worker, :id)).to eq(1)
+      end
+
+      it 'should return nil if nothing to dig' do
+        expect(top_object.dig(:worker, :sex)).to eq(nil)
+      end
+
+      it 'should raise_error TypeError' do
+        expect { top_object.dig(:worker, :id, :some_key) }.to raise_error(TypeError)
+      end
+    end
+
 
   end
 
