@@ -41,6 +41,10 @@ class Factory
         instance_variable_set(attribute.to_s.insert(0, '@').to_sym, value)
       end
 
+      define_method(:dig) do |*args|
+        to_h.dig(*args)
+      end
+
       define_method(:each) do |&block|
         return enum_for(:each) unless block
         attributes.each { |attribute| block.call(send(attribute)) }
@@ -81,8 +85,7 @@ class Factory
         error = case
             when result.first.nil? then "offset #{from} too small"
             when result.last.nil? then "offset #{to} too large"
-        end
-        
+          end
         raise IndexError, error + " for factory(size:#{size})" if result.any?(&:nil?)
         result
       end
