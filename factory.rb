@@ -34,11 +34,25 @@ class Factory
       end
 
       define_method(:[]) do |arg|
-        arg.is_a?(Fixnum) ? send(attributes[arg]) : send(arg)
+        if arg.is_a?(Integer)
+          raise IndexError unless arg.between?(0, attributes.size-1)
+          send(attributes[arg])
+        else
+          raise NameError unless attributes.include?(arg)
+          send(arg)
+        end
       end
 
-      define_method(:[]=) do |attribute, value|
-        instance_variable_set(attribute.to_s.insert(0, '@').to_sym, value)
+      define_method(:[]=) do |arg, value|
+        self[arg]
+
+        attribute = if arg.is_a?(Integer)
+          attributes[arg].to_s.insert(0, '@').to_sym
+        else
+          arg.to_s.insert(0, '@').to_sym
+        end
+
+        instance_variable_set(attribute, value)
       end
 
       define_method(:dig) do |*args|
