@@ -14,8 +14,8 @@ class Factory
       when args.empty?
         raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'
       when args.size > 1
-        raise NameError, "identifier #{constant} needs to be constant" if constant.nil? && class_args.empty?
-        raise TypeError, "#{class_args[0]} is not a symbol" if class_args.all? { |i| !i.is_a?(Symbol) }
+        raise NameError, "wrong constant name #{constant}" if constant.nil? && class_args.empty?
+        raise TypeError, "#{class_args[0]} is not a symbol nor a string" if class_args.all? { |i| !i.is_a?(Symbol) }
     end
 
     subclass = Class.new do
