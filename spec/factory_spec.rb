@@ -87,5 +87,4 @@ describe Factory do
     end
   end
 
-
 end
