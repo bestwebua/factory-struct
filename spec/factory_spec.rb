@@ -217,7 +217,7 @@ describe Factory do
     end
 
     describe '#members' do
-      it 'should return an array' do
+      it 'should return members for this factory as an array' do
         expect(subject.members.is_a?(Array)).to eq(true)
       end
 
@@ -263,12 +263,34 @@ describe Factory do
     end
 
     describe '#to_a' do
-      it 'should return the values for this factory as an Array' do
+      it 'should be an alias of :values' do
+        expect(subject.method(:to_a).original_name).to eq(:values)
+      end
+
+      it 'return true' do
+        expect(subject.to_a).to eq(subject.values)
+      end
+
+      it 'should return the values for this factory as an array' do
         expect(subject.to_a.is_a?(Array)).to eq(true)
       end
 
       it 'should return all values in default order' do
         expect(subject.to_a).to eq([1, 2])
+      end
+    end
+
+    describe '#to_h' do
+      it 'should return hash' do
+        expect(subject.to_h.is_a?(Hash)).to eq(true)
+      end
+
+      it 'should include all names and values for the factory members' do
+        expect(subject.to_h).to eq({a: 1, b: 2})
+      end
+
+      it 'all keys should be in default order' do
+        expect(subject.to_h.keys).to eq([:a, :b])
       end
     end
 
