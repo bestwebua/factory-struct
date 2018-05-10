@@ -295,16 +295,27 @@ describe Factory do
     end
 
     describe '#values' do
-        it 'should return the values for this factory as an array' do
+      it 'should return an array' do
         expect(subject.to_a.is_a?(Array)).to eq(true)
       end
 
-      it 'should return all values in default order' do
+      it 'all values for this factory should be in default order' do
         expect(subject.to_a).to eq([1, 2])
       end
     end
 
+    describe '#values_at' do
+      it 'should return an array' do
+        expect(subject.values_at(0, 0).is_a?(Array)).to eq(true)
+      end
 
+      it 'should returns the factory member values for each selector as an array' do
+        expect(subject.values_at(0, 1)).to eq([1,2])
+      end
+
+      it 'should raise IndexError if offset out of the range' do
+        expect { subject.values_at(0, 100) }.to raise_error(IndexError)
+      end
+    end
   end
-
 end
