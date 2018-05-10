@@ -60,11 +60,13 @@ class Factory
       define_method(:each) do |&block|
         return enum_for(:each) unless block
         attributes.each { |attribute| block.call(send(attribute)) }
+        self
       end
 
       define_method(:each_pair) do |&block|
         return enum_for(:each) unless block
-        attributes.each { |attribute| block.call(attribute, send(attribute)) }
+        to_h.each_pair { |attrs| block.call(*attrs) }
+        self
       end
 
       define_method(:eql?) do |other|
