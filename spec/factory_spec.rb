@@ -123,6 +123,7 @@ describe Factory do
     end
 
     describe '#[]=' do
+
       subject(:change_by_key)   { @factory_object.new(1, 2)[:a] = 100 }
       subject(:change_by_index) { @factory_object.new(1, 2)[1] = 200 }
 
@@ -144,6 +145,7 @@ describe Factory do
     end
 
     describe '#dig' do
+
       subject(:nested_object) { Factory.new(:id, :position).new(1, 'PR') }
       subject(:top_object)    { Factory.new(:company, :worker).new('SecretCompany', nested_object) }
 
@@ -177,6 +179,24 @@ describe Factory do
 
       it 'return an enumerator if no block is given' do
         expect(subject.each_pair.class).to eq(Enumerator)
+      end
+    end
+
+    describe '#eql?' do
+
+      subject(:object) { Factory.new(:a, :b).new(1, 2) }
+      subject(:same_object_with_other_values) { Factory.new(:a, :b).new(1, 2.0) }
+
+      it 'return false if object was other type' do
+        expect(subject).to_not eql(Object.new)
+      end
+
+      it 'return true if they have the same factory subclass and have equal member values' do
+        expect(subject).to eql(subject)
+      end
+
+      it 'return false if objects has different values' do
+        expect(object).to_not eql(same_object_with_other_values)
       end
     end
 
