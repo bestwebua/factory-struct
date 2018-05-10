@@ -216,6 +216,28 @@ describe Factory do
       end
     end
 
+    describe '#members' do
+      it 'should return an array' do
+        expect(subject.members.is_a?(Array)).to eq(true)
+      end
+
+      it 'should equal size to quantity of instance variables' do
+        expect(subject.members.size).to eq(2)
+      end
+
+      it 'all return items of array should be a symbols' do
+        expect(subject.members.all?(&:to_sym)).to eq(true)
+      end
+
+      it 'should return first factory member' do
+        expect(subject.members.first).to eq(:a)
+      end
+
+      it 'should return all members in default order' do
+        expect(subject.members).to eq([:a, :b])
+      end
+    end
+
 
   end
 
