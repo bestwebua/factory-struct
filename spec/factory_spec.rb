@@ -238,6 +238,20 @@ describe Factory do
       end
     end
 
+    describe '#select' do
+      it 'should return an array' do
+        expect(subject.select(&:odd?).is_a?(Array)).to eq(true)
+      end
+
+      it 'should return all finded results in default order' do
+        expect(subject.select(&:to_i)).to eq([1, 2])
+      end
+
+      it 'return an enumerator if no block is given' do
+        expect(subject.select.class).to eq(Enumerator)
+      end
+    end
+
 
   end
 
