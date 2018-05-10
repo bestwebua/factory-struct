@@ -92,11 +92,11 @@ describe Factory do
 
     describe '#==' do
 
-      subject(:item1) { item }
+      subject(:item1) { subject }
       subject(:item2) { @factory_object.new(1, 2.0)}
       
       it 'return true' do
-        expect(item1 == item).to eq(true)
+        expect(item1 == subject).to eq(true)
       end
 
       it 'return true' do
@@ -106,19 +106,19 @@ describe Factory do
 
     describe '#[]' do
       it 'factory[member] should return object' do
-        expect(item[:a]).to eq(1)
+        expect(subject[:a]).to eq(1)
       end
 
       it 'should raise NameError if the member does not exist' do
-        expect { item[:c] }.to raise_error(NameError)
+        expect { subject[:c] }.to raise_error(NameError)
       end
 
       it 'factory[index] should return object' do
-        expect(item[1]).to eq(2)
+        expect(subject[1]).to eq(2)
       end
 
       it 'should raise IndexError if the index is out of range' do
-        expect { item[2] }.to raise_error(IndexError)
+        expect { subject[2] }.to raise_error(IndexError)
       end
     end
 
@@ -157,6 +157,26 @@ describe Factory do
 
       it 'should raise_error TypeError' do
         expect { top_object.dig(:worker, :id, :some_key) }.to raise_error(TypeError)
+      end
+    end
+
+    describe '#each' do
+      it 'should yields the value of each factory member in order' do
+        expect(subject.each.to_a).to eq([1,2])
+      end
+
+      it 'return an enumerator if no block is given' do
+        expect(subject.each.class).to eq(Enumerator)
+      end
+    end
+
+    describe '#each_pair' do
+      it 'should yields the name and value of each factory member in order' do
+        expect(subject.each_pair { |k,v| }.to_a).to eq([[:a, 1], [:b, 2]])
+      end
+
+      it 'return an enumerator if no block is given' do
+        expect(subject.each_pair.class).to eq(Enumerator)
       end
     end
 
