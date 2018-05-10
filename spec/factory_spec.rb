@@ -252,6 +252,16 @@ describe Factory do
       end
     end
 
+    describe '#size' do
+      it 'should be an alias of :length' do
+        expect(subject.method(:size).original_name).to eq(:length)
+      end
+
+      it 'return true' do
+        expect(subject.size).to eq(subject.length)
+      end
+    end
+
 
   end
 
