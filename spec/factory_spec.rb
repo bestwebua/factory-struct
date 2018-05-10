@@ -200,6 +200,16 @@ describe Factory do
       end
     end
 
+    describe '#to_s' do
+      it 'should be an alias of :inspect' do
+        expect(subject.method(:to_s).original_name).to eq(:inspect)
+      end
+
+      it 'return true' do
+        expect(subject.to_s).to eq(subject.inspect)
+      end
+    end
+
 
   end
 
