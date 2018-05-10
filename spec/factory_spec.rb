@@ -263,11 +263,11 @@ describe Factory do
     end
 
     describe '#to_a' do
-      it 'should return an array' do
+      it 'should return the values for this factory as an Array' do
         expect(subject.to_a.is_a?(Array)).to eq(true)
       end
 
-      it 'should return all members in default order' do
+      it 'should return all values in default order' do
         expect(subject.to_a).to eq([1, 2])
       end
     end
