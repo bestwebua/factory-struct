@@ -210,6 +210,12 @@ describe Factory do
       end
     end
 
+    describe '#length' do
+      it 'should return number of factory members' do
+        expect(subject.length).to eq(2)
+      end
+    end
+
 
   end
 
