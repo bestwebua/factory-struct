@@ -294,6 +294,16 @@ describe Factory do
       end
     end
 
+    describe '#values' do
+        it 'should return the values for this factory as an array' do
+        expect(subject.to_a.is_a?(Array)).to eq(true)
+      end
+
+      it 'should return all values in default order' do
+        expect(subject.to_a).to eq([1, 2])
+      end
+    end
+
 
   end
 
