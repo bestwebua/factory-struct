@@ -110,7 +110,7 @@ describe Factory do
       end
 
       it 'should raise NameError if the member does not exist' do
-        expect { subject[:c] }.to raise_error(NameError)
+        expect { subject[:c] }.to raise_error(NameError, "no member 'c' in factory")
       end
 
       it 'factory[index] should return object' do
@@ -118,7 +118,7 @@ describe Factory do
       end
 
       it 'should raise IndexError if the index is out of range' do
-        expect { subject[2] }.to raise_error(IndexError)
+        expect { subject[2] }.to raise_error(IndexError, 'offset 2 too large for factory(size:2)')
       end
     end
 
@@ -132,7 +132,7 @@ describe Factory do
       end
 
       it 'should raise NameError if the member does not exist' do
-        expect { item[:c] }.to raise_error(NameError)
+        expect { item[:c] }.to raise_error(NameError, "no member 'c' in factory")
       end
 
       it 'factory[index]= should change value' do
@@ -140,7 +140,7 @@ describe Factory do
       end
 
       it 'should raise IndexError if the index is out of range' do
-        expect { item[2] }.to raise_error(IndexError)
+        expect { item[2] }.to raise_error(IndexError, 'offset 2 too large for factory(size:2)')
       end
     end
 
@@ -158,7 +158,7 @@ describe Factory do
       end
 
       it 'should raise_error TypeError' do
-        expect { top_object.dig(:worker, :id, :some_key) }.to raise_error(TypeError)
+        expect { top_object.dig(:worker, :id, :some_key) }.to raise_error(TypeError, 'Integer does not have #dig method')
       end
     end
 
@@ -314,7 +314,15 @@ describe Factory do
       end
 
       it 'should raise IndexError if offset out of the range' do
-        expect { subject.values_at(0, 100) }.to raise_error(IndexError)
+        expect { subject.values_at(0, 100) }.to raise_error(IndexError, 'offset 100 too large for factory(size:2)')
+      end
+
+      it 'should raise IndexError if offset out of the range' do
+        expect { subject.values_at(-10, 1) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
+      end
+
+      it 'should raise IndexError with info about first offset if 2 offsets is out of the range' do
+        expect { subject.values_at(-10, 100) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
       end
     end
   end
