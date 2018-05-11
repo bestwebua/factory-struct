@@ -35,10 +35,12 @@ class Factory
 
       define_method(:[]) do |arg|
         if arg.is_a?(Integer)
-          raise IndexError unless arg.between?(0, attributes.size-1)
+          index_error = "offset #{arg} too large for factory(size:#{self.size})"
+          raise IndexError, index_error unless arg.between?(0, attributes.size-1)
           send(attributes[arg])
         else
-          raise NameError unless attributes.include?(arg)
+          name_error = "no member '#{arg}' in factory"
+          raise NameError, name_error unless attributes.include?(arg)
           send(arg)
         end
       end
