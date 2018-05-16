@@ -6,6 +6,8 @@ end
 
 class Factory
 
+  include Enumerable
+
   def self.new(*args)
     constant = args[0].is_a?(String) && args[0].is_a_const? ? args[0] : nil
     class_args = constant.nil? ? args : args[1..-1]
@@ -18,10 +20,15 @@ class Factory
         raise TypeError, "#{class_args[0]} is not a symbol nor a string" if class_args.all? { |i| !i.is_a?(Symbol) }
     end
 
-    subclass = Class.new do
+    subclass = Class.new Factory do
 
-      include Enumerable
       attr_accessor *class_args
+
+      define_singleton_method(:new) do |*args|
+        object = allocate
+        object.send(:initialize, *args)
+        object
+      end
 
       define_method(:initialize) do |*args|
         subclass_args = Array.new(class_args.size).map.with_index { |item, index| args[index] }
