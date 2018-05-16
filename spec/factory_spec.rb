@@ -7,14 +7,14 @@ describe Factory do
 
   describe '.new' do
 
-    subject(:without_args)    { Factory.new }
-    subject(:without_name)    { Factory.new(:a, :b).new }
-    subject(:with_wrong_name) { Factory.new('wrong_constant') }
-    subject(:with_right_name) { Factory.new('Name').new }
-    subject(:with_wrong_keys) { Factory.new(:a, 1) }
-    subject(:with_keys)       { Factory.new(:a, :b).new }
-    subject(:with_mix_keys)   { Factory.new(:a, 'b').new }
-    subject(:with_name_keys)  { @factory_object.new }
+    let(:without_args)    { Factory.new }
+    let(:without_name)    { Factory.new(:a, :b).new }
+    let(:with_wrong_name) { Factory.new('wrong_constant') }
+    let(:with_right_name) { Factory.new('Name').new }
+    let(:with_wrong_keys) { Factory.new(:a, 1) }
+    let(:with_keys)       { Factory.new(:a, :b).new }
+    let(:with_mix_keys)   { Factory.new(:a, 'b').new }
+    let(:with_name_keys)  { @factory_object.new }
 
     it 'should raise an ArgumentError error if arguments not passed' do
       expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
@@ -25,7 +25,7 @@ describe Factory do
     end
 
     it 'should have instance variables based by send keys' do
-      expect(without_name.instance_variables).to eq([:@a, :@b])
+      expect(without_name.instance_variables).to eq(%i[@a @b])
     end
 
     it 'should raise NameError error' do
@@ -41,28 +41,32 @@ describe Factory do
     end
 
     it 'should have instance variables based by send keys' do
-      expect(with_keys.instance_variables).to eq([:@a, :@b])
+      expect(with_keys.instance_variables).to eq(%i[@a @b])
     end
 
     it 'should have instance variables based by send keys' do
-      expect(with_mix_keys.instance_variables).to eq([:@a, :@b])
+      expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
     end
 
     it 'should be an instance of Factory::Test' do
       expect(with_name_keys).to be_an_instance_of(Factory::Test)
     end
 
+    it 'should have ancestors like Struct' do
+      expect(with_name_keys.class.ancestors).to eq([Factory::Test, Factory, Enumerable, Object, Kernel, BasicObject])
+    end
+
     it 'should have instance variables based by send keys' do
-      expect(with_name_keys.instance_variables).to eq([:@a, :@b])
+      expect(with_name_keys.instance_variables).to eq(%i[@a @b])
     end
 
     describe 'Factory::Test.new' do
 
-      subject(:without_args)                     { @factory_object.new.values.all?(&:nil?) }
-      subject(:with_args_less_than_exists_vars)  { @factory_object.new(1).count(&:nil?) }
-      subject(:base_case)                        { @factory_object.new(1, 2).values }
-      subject(:with_args_equal_vars_by_quantity) { base_case.size }
-      subject(:with_args_more_vars_by_quantity)  { @factory_object.new(1, 2, 3) }
+      let(:without_args)                     { @factory_object.new.values.all?(&:nil?) }
+      let(:with_args_less_than_exists_vars)  { @factory_object.new(1).count(&:nil?) }
+      let(:base_case)                        { @factory_object.new(1, 2).values }
+      let(:with_args_equal_vars_by_quantity) { base_case.size }
+      let(:with_args_more_vars_by_quantity)  { @factory_object.new(1, 2, 3) }
 
       it 'should fill out all values of instance variables with nil' do
         expect(without_args).to eq(true)
@@ -92,8 +96,8 @@ describe Factory do
 
     describe '#==' do
 
-      subject(:item1) { subject }
-      subject(:item2) { @factory_object.new(1, 2.0)}
+      let(:item1) { subject }
+      let(:item2) { @factory_object.new(1, 2.0)}
       
       it 'return true' do
         expect(item1 == subject).to eq(true)
@@ -124,8 +128,8 @@ describe Factory do
 
     describe '#[]=' do
 
-      subject(:change_by_key)   { @factory_object.new(1, 2)[:a] = 100 }
-      subject(:change_by_index) { @factory_object.new(1, 2)[1] = 200 }
+      let(:change_by_key)   { @factory_object.new(1, 2)[:a] = 100 }
+      let(:change_by_index) { @factory_object.new(1, 2)[1] = 200 }
 
       it 'factory[member]= should change value' do
         expect(change_by_key).to eq(100)
@@ -146,15 +150,15 @@ describe Factory do
 
     describe '#dig' do
 
-      subject(:nested_object) { Factory.new(:id, :position).new(1, 'PR') }
-      subject(:top_object)    { Factory.new(:company, :worker).new('SecretCompany', nested_object) }
+      let(:nested_object) { Factory.new(:id, :position).new(1, 'PR') }
+      let(:top_object)    { Factory.new(:company, :worker).new('SecretCompany', nested_object) }
 
       it 'should extract the nested value specified by the sequence of key objects' do
         expect(top_object.dig(:worker, :id)).to eq(1)
       end
 
       it 'should return nil if nothing to dig' do
-        expect(top_object.dig(:worker, :sex)).to eq(nil)
+        expect(top_object.dig(:worker, :sex)).to be_nil
       end
 
       it 'should raise_error TypeError' do
@@ -168,7 +172,7 @@ describe Factory do
       end
 
       it 'return an enumerator if no block is given' do
-        expect(subject.each.class).to eq(Enumerator)
+        expect(subject.each).to be_an_instance_of(Enumerator)
       end
     end
 
@@ -178,14 +182,14 @@ describe Factory do
       end
 
       it 'return an enumerator if no block is given' do
-        expect(subject.each_pair.class).to eq(Enumerator)
+        expect(subject.each_pair).to be_an_instance_of(Enumerator)
       end
     end
 
     describe '#eql?' do
 
-      subject(:object) { Factory.new(:a, :b).new(1, 2) }
-      subject(:same_object_with_other_values) { Factory.new(:a, :b).new(1, 2.0) }
+      let(:object) { Factory.new(:a, :b).new(1, 2) }
+      let(:same_object_with_other_values) { Factory.new(:a, :b).new(1, 2.0) }
 
       it 'return false if object was other type' do
         expect(subject).to_not eql(Object.new)
@@ -218,7 +222,7 @@ describe Factory do
 
     describe '#members' do
       it 'should return members for this factory as an array' do
-        expect(subject.members.is_a?(Array)).to eq(true)
+        expect(subject.members).to be_an_instance_of(Array)
       end
 
       it 'should equal size to quantity of instance variables' do
@@ -234,13 +238,13 @@ describe Factory do
       end
 
       it 'should return all members in default order' do
-        expect(subject.members).to eq([:a, :b])
+        expect(subject.members).to eq(%i[a b])
       end
     end
 
     describe '#select' do
       it 'should return an array' do
-        expect(subject.select(&:odd?).is_a?(Array)).to eq(true)
+        expect(subject.select(&:odd?)).to be_an_instance_of(Array)
       end
 
       it 'should return all finded results in default order' do
@@ -248,7 +252,7 @@ describe Factory do
       end
 
       it 'return an enumerator if no block is given' do
-        expect(subject.select.class).to eq(Enumerator)
+        expect(subject.select).to be_an_instance_of(Enumerator)
       end
     end
 
@@ -272,7 +276,7 @@ describe Factory do
       end
 
       it 'should return the values for this factory as an array' do
-        expect(subject.to_a.is_a?(Array)).to eq(true)
+        expect(subject.to_a).to be_an_instance_of(Array)
       end
 
       it 'should return all values in default order' do
@@ -296,7 +300,7 @@ describe Factory do
 
     describe '#values' do
       it 'should return an array' do
-        expect(subject.to_a.is_a?(Array)).to eq(true)
+        expect(subject.to_a).to be_an_instance_of(Array)
       end
 
       it 'all values for this factory should be in default order' do
@@ -306,7 +310,7 @@ describe Factory do
 
     describe '#values_at' do
       it 'should return an array' do
-        expect(subject.values_at(0, 0).is_a?(Array)).to eq(true)
+        expect(subject.values_at(0, 0)).to be_an_instance_of(Array)
       end
 
       it 'should returns the factory member values for each selector as an array' do
