@@ -84,6 +84,10 @@ class Factory
     self.class == other.class && (self.values).eql?(other.values)
   end
 
+  def hash
+    values.hash
+  end
+
   def length
     members.size
   end
