@@ -7,57 +7,61 @@ describe Factory do
 
   describe '.new' do
 
-    let(:without_args)    { Factory.new }
-    let(:without_name)    { Factory.new(:a, :b).new }
-    let(:with_wrong_name) { Factory.new('wrong_constant') }
-    let(:with_right_name) { Factory.new('Name').new }
-    let(:with_wrong_keys) { Factory.new(:a, 1) }
-    let(:with_keys)       { Factory.new(:a, :b).new }
-    let(:with_mix_keys)   { Factory.new(:a, 'b').new }
-    let(:with_name_keys)  { @factory_object.new }
+    let(:without_args)        { Factory.new }
+    let(:without_name)        { Factory.new(:a, :b).new }
+    let(:with_wrong_keys)     { Factory.new(:a, 1) }
+    let(:with_keys)           { Factory.new(:a, :b).new }
+    let(:with_mix_keys)       { Factory.new(:a, 'b').new }
+    let(:with_wrong_name)     { Factory.new('wrong_constant') }
+    let(:with_name_and_keys)  { @factory_object.new }
+    
 
-    it 'should raise an ArgumentError error if arguments not passed' do
-      expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
+    context 'factory object without name' do
+      it 'should raise an ArgumentError error if arguments not passed' do
+        expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
+      end
+
+      it 'should be an instance of Class' do
+        expect(without_name.class).to be_an_instance_of(Class)
+      end
+
+      it 'should have instance variables based by send keys' do
+        expect(without_name.instance_variables).to eq(%i[@a @b])
+      end
+
+      it 'should raise TypeError error' do
+        expect { with_wrong_keys }.to raise_error(TypeError, '1 is not a symbol nor a string')
+      end
+
+      it 'should have instance variables based by send keys' do
+        expect(with_keys.instance_variables).to eq(%i[@a @b])
+      end
+
+      it 'should have instance variables based by send keys' do
+        expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
+      end
     end
 
-    it 'should be an instance of Class' do
-      expect(without_name.class).to be_an_instance_of(Class)
-    end
+    context 'factory object with name' do
+      it 'should raise NameError error' do
+        expect { with_wrong_name }.to raise_error(NameError, 'wrong constant name wrong_constant')
+      end
 
-    it 'should have instance variables based by send keys' do
-      expect(without_name.instance_variables).to eq(%i[@a @b])
-    end
+      it 'should be an instance of Factory::Test' do
+        expect(with_name_and_keys).to be_an_instance_of(Factory::Test)
+      end
 
-    it 'should raise NameError error' do
-      expect { with_wrong_name }.to raise_error(NameError, 'wrong constant name wrong_constant')
-    end
+      it 'should have instance variables based by send keys' do
+        expect(with_name_and_keys.instance_variables).to eq(%i[@a @b])
+      end
 
-    it 'should be an instance of Factory::Test' do
-      expect(with_right_name).to be_an_instance_of(Factory::Name)
-    end
+      it 'should have ancestors like Struct' do
+        expect(with_name_and_keys.class.ancestors).to eq([Factory::Test, Factory, Enumerable, Object, Kernel, BasicObject])
+      end
 
-    it 'should raise TypeError error' do
-      expect { with_wrong_keys }.to raise_error(TypeError, '1 is not a symbol nor a string')
-    end
-
-    it 'should have instance variables based by send keys' do
-      expect(with_keys.instance_variables).to eq(%i[@a @b])
-    end
-
-    it 'should have instance variables based by send keys' do
-      expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
-    end
-
-    it 'should be an instance of Factory::Test' do
-      expect(with_name_keys).to be_an_instance_of(Factory::Test)
-    end
-
-    it 'should have ancestors like Struct' do
-      expect(with_name_keys.class.ancestors).to eq([Factory::Test, Factory, Enumerable, Object, Kernel, BasicObject])
-    end
-
-    it 'should have instance variables based by send keys' do
-      expect(with_name_keys.instance_variables).to eq(%i[@a @b])
+      it 'should return getters and setters only' do
+        expect(with_name_and_keys.public_methods(all=false)).to eq(%i[a= a b= b])
+      end
     end
 
     describe 'Factory::Test.new' do
@@ -309,24 +313,66 @@ describe Factory do
     end
 
     describe '#values_at' do
-      it 'should return an array' do
-        expect(subject.values_at(0, 0)).to be_an_instance_of(Array)
+      context 'arguments' do
+        context 'nubers' do
+          it 'should be an array' do
+            expect(subject.values_at).to be_an_instance_of(Array)
+          end
+
+          it 'return an empty array' do
+            expect(subject.values_at.empty?).to eq(true)
+          end
+
+          it 'should return the factory member values for each selector as an array' do
+            expect(subject.values_at(0)).to eq([1])
+          end
+
+          it 'should accept multiarguments' do
+            expect(subject.values_at(0, 1, 0)).to eq([1, 2, 1])
+          end
+        end
+
+        context 'ranges' do
+          it 'should accept range' do
+            expect(subject.values_at(0..1)).to eq([1, 2])
+          end
+
+          it 'should return nils if the upper range is outside' do
+            expect(subject.values_at(0..3)).to eq([1, 2, nil, nil])
+          end
+
+          it 'should accept ranges'  do
+            expect(subject.values_at(0..1, 0..3)).to eq([1, 2, 1, 2, nil, nil])
+          end
+        end
+
+        context 'numbers and ranges' do
+          it 'should accept nubers and ranges' do
+            expect(subject.values_at(1, 0..1)).to eq([2, 1, 2])
+          end
+        end
       end
 
-      it 'should returns the factory member values for each selector as an array' do
-        expect(subject.values_at(0, 1)).to eq([1,2])
-      end
+      context 'errors' do
+        it 'should raise IndexError if offset out of the range' do
+          expect { subject.values_at(0, 100) }.to raise_error(IndexError, 'offset 100 too large for factory(size:2)')
+        end
 
-      it 'should raise IndexError if offset out of the range' do
-        expect { subject.values_at(0, 100) }.to raise_error(IndexError, 'offset 100 too large for factory(size:2)')
-      end
+        it 'should raise IndexError if offset out of the range' do
+          expect { subject.values_at(-10, 1) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
+        end
 
-      it 'should raise IndexError if offset out of the range' do
-        expect { subject.values_at(-10, 1) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
-      end
+        it 'should raise IndexError with info about first offset if 2 offsets is out of the range' do
+          expect { subject.values_at(-10, 100) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
+        end
 
-      it 'should raise IndexError with info about first offset if 2 offsets is out of the range' do
-        expect { subject.values_at(-10, 100) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
+        it 'should raise RangeError if first range value was out of range' do
+          expect { subject.values_at(-10..0) }.to raise_error(RangeError, '-10..0 out of range')
+        end
+
+        it 'should raise IndexError first' do
+          expect { subject.values_at(-10..0, -100) }.to raise_error(IndexError, 'offset -100 too small for factory(size:2)')
+        end
       end
     end
   end
