@@ -300,7 +300,7 @@ describe Factory do
       end
 
       it 'all keys should be in default order' do
-        expect(subject.to_h.keys).to eq([:a, :b])
+        expect(subject.to_h.keys).to eq(%i[a b])
       end
     end
 
