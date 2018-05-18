@@ -192,21 +192,29 @@ describe Factory do
       end
     end
 
-    describe '#eql?' do
+    describe 'eql methods' do
 
-      let(:object) { Factory.new(:a, :b).new(1, 2) }
-      let(:same_object_with_other_values) { Factory.new(:a, :b).new(1, 2.0) }
+      let(:object)                        { @factory_object.new(1, 2) }
+      let(:same_object_with_other_values) { @factory_object.new(1, 2.0) }
 
-      it 'return false if object was other type' do
-        expect(subject).to_not eql(Object.new)
+      context '#eql?' do
+        it 'return false if object was other type' do
+          expect(subject).to_not eql(Object.new)
+        end
+
+        it 'return true if they have the same factory subclass and have equal member values' do
+          expect(subject).to eql(object)
+        end
+
+        it 'return false if objects has different values' do
+          expect(subject).to_not eql(same_object_with_other_values)
+        end
       end
 
-      it 'return true if they have the same factory subclass and have equal member values' do
-        expect(subject).to eql(subject)
-      end
-
-      it 'return false if objects has different values' do
-        expect(object).to_not eql(same_object_with_other_values)
+      context '#hash' do
+        it 'return true if both hashes was equal' do
+          expect(subject.hash).to eq(object.hash)
+        end
       end
     end
 
