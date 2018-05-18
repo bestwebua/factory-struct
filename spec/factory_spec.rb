@@ -292,7 +292,7 @@ describe Factory do
 
     describe '#to_h' do
       it 'should return hash' do
-        expect(subject.to_h.is_a?(Hash)).to eq(true)
+        expect(subject.to_h).to be_an_instance_of(Hash)
       end
 
       it 'should include all names and values for the factory members' do
