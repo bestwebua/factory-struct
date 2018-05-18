@@ -115,7 +115,7 @@ class Factory
         when arg < -values.size then "offset #{arg} too small"
         when arg > values.size-1 then "offset #{arg} too large"
       end
-      raise IndexError, error + " for factory(size:#{size})" if error
+      raise IndexError, "#{error} for factory(size:#{size})" if error
     end
     values.values_at(*args)
   end
