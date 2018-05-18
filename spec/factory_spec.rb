@@ -7,64 +7,66 @@ describe Factory do
 
   describe '.new' do
 
-    let(:without_args)        { Factory.new }
-    let(:without_name)        { Factory.new(:a, :b).new }
-    let(:with_wrong_keys)     { Factory.new(:a, 1) }
-    let(:with_keys)           { Factory.new(:a, :b).new }
-    let(:with_mix_keys)       { Factory.new(:a, 'b').new }
-    let(:with_wrong_name)     { Factory.new('wrong_constant') }
-    let(:with_name_and_keys)  { @factory_object.new }
-    
+    context 'object keys' do
 
-    context 'factory object without name' do
-      it 'should raise an ArgumentError error if arguments not passed' do
-        expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
+      let(:without_args)        { Factory.new }
+      let(:without_name)        { Factory.new(:a, :b).new }
+      let(:with_wrong_keys)     { Factory.new(:a, 1) }
+      let(:with_keys)           { Factory.new(:a, :b).new }
+      let(:with_mix_keys)       { Factory.new(:a, 'b').new }
+      let(:with_wrong_name)     { Factory.new('wrong_constant') }
+      let(:with_name_and_keys)  { @factory_object.new }
+      
+      context 'factory object without name' do
+        it 'should raise an ArgumentError error if arguments not passed' do
+          expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
+        end
+
+        it 'should be an instance of Class' do
+          expect(without_name.class).to be_an_instance_of(Class)
+        end
+
+        it 'should have instance variables based by send keys' do
+          expect(without_name.instance_variables).to eq(%i[@a @b])
+        end
+
+        it 'should raise TypeError error' do
+          expect { with_wrong_keys }.to raise_error(TypeError, '1 is not a symbol nor a string')
+        end
+
+        it 'should have instance variables based by send keys' do
+          expect(with_keys.instance_variables).to eq(%i[@a @b])
+        end
+
+        it 'should have instance variables based by send keys' do
+          expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
+        end
       end
 
-      it 'should be an instance of Class' do
-        expect(without_name.class).to be_an_instance_of(Class)
-      end
+      context 'factory object with name' do
+        it 'should raise NameError error' do
+          expect { with_wrong_name }.to raise_error(NameError, 'wrong constant name wrong_constant')
+        end
 
-      it 'should have instance variables based by send keys' do
-        expect(without_name.instance_variables).to eq(%i[@a @b])
-      end
+        it 'should be an instance of Factory::Test' do
+          expect(with_name_and_keys).to be_an_instance_of(Factory::Test)
+        end
 
-      it 'should raise TypeError error' do
-        expect { with_wrong_keys }.to raise_error(TypeError, '1 is not a symbol nor a string')
-      end
+        it 'should have instance variables based by send keys' do
+          expect(with_name_and_keys.instance_variables).to eq(%i[@a @b])
+        end
 
-      it 'should have instance variables based by send keys' do
-        expect(with_keys.instance_variables).to eq(%i[@a @b])
-      end
+        it 'should have ancestors like Struct' do
+          expect(with_name_and_keys.class.ancestors).to eq([Factory::Test, Factory, Enumerable, Object, Kernel, BasicObject])
+        end
 
-      it 'should have instance variables based by send keys' do
-        expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
+        it 'should return getters and setters only' do
+          expect(with_name_and_keys.public_methods(all=false).sort).to eq(%i[a a= b b=])
+        end
       end
     end
 
-    context 'factory object with name' do
-      it 'should raise NameError error' do
-        expect { with_wrong_name }.to raise_error(NameError, 'wrong constant name wrong_constant')
-      end
-
-      it 'should be an instance of Factory::Test' do
-        expect(with_name_and_keys).to be_an_instance_of(Factory::Test)
-      end
-
-      it 'should have instance variables based by send keys' do
-        expect(with_name_and_keys.instance_variables).to eq(%i[@a @b])
-      end
-
-      it 'should have ancestors like Struct' do
-        expect(with_name_and_keys.class.ancestors).to eq([Factory::Test, Factory, Enumerable, Object, Kernel, BasicObject])
-      end
-
-      it 'should return getters and setters only' do
-        expect(with_name_and_keys.public_methods(all=false).sort).to eq(%i[a a= b b=])
-      end
-    end
-
-    describe 'Factory::Test.new' do
+    describe 'object values' do
 
       let(:without_args)                     { @factory_object.new.values.all?(&:nil?) }
       let(:with_args_less_than_exists_vars)  { @factory_object.new(1).count(&:nil?) }
