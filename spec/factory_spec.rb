@@ -60,7 +60,7 @@ describe Factory do
       end
 
       it 'should return getters and setters only' do
-        expect(with_name_and_keys.public_methods(all=false)).to eq(%i[a= a b= b])
+        expect(with_name_and_keys.public_methods(all=false).sort).to eq(%i[a a= b b=])
       end
     end
 
