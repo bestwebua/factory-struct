@@ -30,8 +30,8 @@ class Factory
       end
 
       define_method(:initialize) do |*args|
-        subclass_args = Array.new(class_args.size).map.with_index { |item, index| args[index] }
         raise ArgumentError, 'factory size differs' if args.size > class_args.size
+        subclass_args = Array.new(class_args.size).map.with_index { |item, index| args[index] }
         class_args.zip(subclass_args).each { |accessor, value| public_send("#{accessor}=", value) }
       end
     end
