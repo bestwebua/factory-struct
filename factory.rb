@@ -30,7 +30,7 @@ class Factory
       end
 
       define_method(:initialize) do |*args|
-        raise ArgumentError, 'factory size differs' if args.size > class_args.size
+        raise ArgumentError, "#{class_name} size differs" if args.size > class_args.size
         subclass_args = Array.new(class_args.size).map.with_index { |item, index| args[index] }
         class_args.zip(subclass_args).each { |accessor, value| public_send("#{accessor}=", value) }
       end
@@ -45,11 +45,11 @@ class Factory
 
   def [] (arg)
     if arg.is_a?(Integer)
-      index_error = "offset #{arg} too large for factory(size:#{self.size})"
+      index_error = "offset #{arg} too large for #{class_name}(size:#{self.size})"
       raise IndexError, index_error unless arg.between?(0, members.size-1)
       send(members[arg])
     else
-      name_error = "no member '#{arg}' in factory"
+      name_error = "no member '#{arg}' in #{class_name}"
       raise NameError, name_error unless members.include?(arg)
       send(arg)
     end
@@ -88,6 +88,12 @@ class Factory
     values.hash
   end
 
+  def inspect
+    name_space = self.class if self.class.to_s.include?('::')
+    vars_values = to_h.map { |k,v| "#{k}=#{v.inspect}" }.join(', ')
+    "#<#{class_name} #{name_space} #{vars_values}>"
+  end
+
   def length
     members.size
   end
@@ -115,7 +121,7 @@ class Factory
         when arg < -values.size then "offset #{arg} too small"
         when arg > values.size-1 then "offset #{arg} too large"
       end
-      raise IndexError, "#{error} for factory(size:#{size})" if error
+      raise IndexError, "#{error} for #{class_name}(size:#{size})" if error
     end
     values.values_at(*args)
   end
@@ -123,5 +129,11 @@ class Factory
   alias :size :length
   alias :to_a :values
   alias :to_s :inspect
+
+  private
+
+  def class_name
+    self.class.superclass.to_s.downcase
+  end
 
 end
