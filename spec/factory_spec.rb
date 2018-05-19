@@ -218,6 +218,23 @@ describe Factory do
       end
     end
 
+    describe '#inspect' do
+      let(:object_wihout_name)    { Factory.new(:a, :b).new(1, 2) }
+      let(:object_without_values) { @factory_object.new }
+
+      it 'should return custom inspect for object' do
+        expect(subject.inspect).to eq('#<factory Factory::Test a=1, b=2>')
+      end
+
+      it 'should return custom inspect for object without name' do
+        expect(object_wihout_name.inspect).to eq('#<factory  a=1, b=2>')
+      end
+
+      it 'should return custom inspect for object without values' do
+        expect(object_without_values.inspect).to eq('#<factory Factory::Test a=nil, b=nil>')
+      end
+    end
+
     describe '#to_s' do
       it 'should be an alias of :inspect' do
         expect(subject.method(:to_s).original_name).to eq(:inspect)
