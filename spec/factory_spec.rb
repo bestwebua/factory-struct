@@ -96,6 +96,7 @@ describe Factory do
     end
 
     describe 'object public methods' do
+
       let(:factory_methods) { Factory.instance_methods(all=false).sort }
       let(:struct_methods)  { Struct.instance_methods(all=false).sort.first(18) }
 
@@ -112,14 +113,14 @@ describe Factory do
     describe '#==' do
 
       let(:item1) { subject }
-      let(:item2) { @factory_object.new(1, 2.0)}
+      let(:item2) { @factory_object.new(1, 2.0) }
       
       it 'return true' do
-        expect(item1 == subject).to eq(true)
+        expect(item1).to eq(subject)
       end
 
       it 'return true' do
-        expect(item1 == item2).to eq(true)
+        expect(item1).to eq(item2)
       end
     end
 
@@ -221,7 +222,7 @@ describe Factory do
       end
 
       context '#hash' do
-        it 'return true if both hashes was equal' do
+        it 'return true if both hashes were equal values' do
           expect(subject.hash).to eq(object.hash)
         end
       end
@@ -356,7 +357,7 @@ describe Factory do
           end
 
           it 'return an empty array' do
-            expect(subject.values_at.empty?).to eq(true)
+            expect(subject.values_at).to be_empty
           end
 
           it 'should return the factory member values for each selector as an array' do
