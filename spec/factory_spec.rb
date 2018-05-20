@@ -94,6 +94,12 @@ describe Factory do
         expect(base_case).to eq([1, 2])
       end
     end
+
+    describe 'object public methods' do
+      it 'should equal Struct public methods' do
+        expect(Factory.instance_methods(all=false).sort).to eq(Struct.instance_methods(all=false).sort.first(18))
+      end
+    end
   end
 
   describe 'Factory::Test' do
