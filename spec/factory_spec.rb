@@ -96,8 +96,11 @@ describe Factory do
     end
 
     describe 'object public methods' do
+      let(:factory_methods) { Factory.instance_methods(all=false).sort }
+      let(:struct_methods)  { Struct.instance_methods(all=false).sort.first(18) }
+
       it 'should equal Struct public methods' do
-        expect(Factory.instance_methods(all=false).sort).to eq(Struct.instance_methods(all=false).sort.first(18))
+        expect(factory_methods).to eq(struct_methods)
       end
     end
   end
