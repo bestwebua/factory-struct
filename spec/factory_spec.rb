@@ -75,7 +75,7 @@ describe Factory do
       let(:with_args_more_vars_by_quantity)  { @factory_object.new(1, 2, 3) }
 
       it 'should fill out all values of instance variables with nil' do
-        expect(without_args).to eq(true)
+        expect(without_args).to be(true)
       end
 
       it 'should fill out all values of instance variables with not passed args with nil' do
@@ -271,7 +271,7 @@ describe Factory do
       end
 
       it 'all return items of array should be a symbols' do
-        expect(subject.members.all?(&:to_sym)).to eq(true)
+        expect(subject.members.all?(&:to_sym)).to be(true)
       end
 
       it 'should return first factory member' do
