@@ -1,6 +1,6 @@
 class String
   def is_a_const?
-    [/[A-Z]{1}[a-zA-Z0-9_]+/]
+    [/\A[A-Z]{1}[a-zA-Z0-9_]+\z/]
   end
 end
 
