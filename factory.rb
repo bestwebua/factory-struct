@@ -1,22 +1,20 @@
-class String
-  def is_a_const?
-    [/\A[A-Z]{1}[a-zA-Z0-9_]+\z/]
+class Object
+  def a_const?
+    is_a?(String) && [/\A[A-Z]{1}[a-zA-Z0-9_]+\z/]
   end
 end
 
 class Factory
-
   include Enumerable
 
   def self.new(*args)
-    constant = args[0].is_a?(String) && args[0].is_a_const? ? args[0] : nil
+    constant = args[0].a_const? ? args[0] : nil
     class_args = constant.nil? ? args : args[1..-1]
 
     case
       when args.empty?
         raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'
       when args.size > 1
-        raise NameError, "wrong constant name #{constant}" if constant.nil? && class_args.empty?
         raise TypeError, "#{class_args[0]} is not a symbol nor a string" if class_args.all? { |i| !i.is_a?(Symbol) }
     end
 
@@ -36,7 +34,11 @@ class Factory
       end
     end
 
-    constant.nil? ? subclass : const_set(constant, subclass)
+    begin
+      constant.nil? ? subclass : const_set(constant, subclass)
+    rescue
+      raise NameError, "identifier #{args[0]} needs to be constant"
+    end
   end
 
   def == (other)
@@ -135,5 +137,4 @@ class Factory
   def class_name
     self.class.superclass.to_s.downcase
   end
-
 end
