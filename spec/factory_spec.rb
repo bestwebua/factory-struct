@@ -17,19 +17,11 @@ describe Factory do
       
       context 'factory object without name' do
         specify do
-          expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
-        end
-        
-        specify do
           expect(without_name.class).to be_an_instance_of(Class)
         end
 
         it 'should have instance variables based by send keys' do
           expect(without_name.instance_variables).to eq(%i[@a @b])
-        end
-
-        specify do
-          expect { with_wrong_keys }.to raise_error(TypeError, '1 is not a symbol nor a string')
         end
 
         it 'should have instance variables based by send keys' do
@@ -38,6 +30,16 @@ describe Factory do
 
         it 'should have instance variables based by send keys' do
           expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
+        end
+
+        context 'errors' do
+          specify do
+            expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
+          end
+
+          specify do
+            expect { with_wrong_keys }.to raise_error(TypeError, '1 is not a symbol nor a string')
+          end
         end
       end
 
@@ -87,12 +89,16 @@ describe Factory do
         expect(with_args_equal_vars_by_quantity).to eq(2)
       end
 
-      specify do
-        expect { with_args_more_vars_by_quantity }.to raise_error(ArgumentError, 'factory size differs')
+      context 'passed args more than quantity of defined args' do
+        specify do
+          expect { with_args_more_vars_by_quantity }.to raise_error(ArgumentError, 'factory size differs')
+        end
       end
 
-      it 'returns true if instance variables values equal all passed args' do
-        expect(base_case).to eq([1, 2])
+      context 'instance variables values equal all passed args' do
+        it 'returns true' do
+          expect(base_case).to eq([1, 2])
+        end
       end
     end
 
@@ -129,16 +135,22 @@ describe Factory do
         expect(subject[:a]).to eq(1)
       end
 
-      it 'raises NameError if the member does not exist' do
-        expect { subject[:c] }.to raise_error(NameError, "no member 'c' in factory")
-      end
-
       it 'factory[index] returns object' do
         expect(subject[1]).to eq(2)
       end
 
-      it 'raises IndexError if the index is out of range' do
-        expect { subject[2] }.to raise_error(IndexError, 'offset 2 too large for factory(size:2)')
+      context 'errors' do
+        context 'member does not exist' do
+          specify do
+            expect { subject[:c] }.to raise_error(NameError, "no member 'c' in factory")
+          end
+        end
+
+        context 'index is out of range' do
+          specify do
+            expect { subject[2] }.to raise_error(IndexError, 'offset 2 too large for factory(size:2)')
+          end
+        end
       end
     end
 
@@ -150,16 +162,22 @@ describe Factory do
         expect(change_by_key).to eq(100)
       end
 
-      it 'raises NameError if the member does not exist' do
-        expect { item[:c] }.to raise_error(NameError, "no member 'c' in factory")
-      end
-
       it 'factory[index]= should change value' do
         expect(change_by_index).to eq(200)
       end
 
-      it 'raises IndexError if the index is out of range' do
-        expect { item[2] }.to raise_error(IndexError, 'offset 2 too large for factory(size:2)')
+      context 'errors' do
+        context 'member does not exist' do
+          specify do
+            expect { item[:c] }.to raise_error(NameError, "no member 'c' in factory")
+          end
+        end
+
+        context 'index is out of range' do
+          specify do
+            expect { item[2] }.to raise_error(IndexError, 'offset 2 too large for factory(size:2)')
+          end
+        end
       end
     end
 
@@ -175,7 +193,7 @@ describe Factory do
         expect(top_object.dig(:worker, :sex)).to be_nil
       end
 
-      it 'raises error TypeError' do
+      specify do
         expect { top_object.dig(:worker, :id, :some_key) }.to raise_error(TypeError, 'Integer does not have #dig method')
       end
     end
@@ -385,39 +403,45 @@ describe Factory do
             expect(subject.values_at(1, 0..1)).to eq([2, 1, 2])
           end
         end
+
+        context 'errors' do
+          context 'IndexError' do
+            context 'large offset, out of the range' do
+              specify do
+                expect { subject.values_at(0, 100) }.to raise_error(IndexError, 'offset 100 too large for factory(size:2)')
+              end
+            end
+
+            context 'small offset, out of the range' do
+              specify do
+                expect { subject.values_at(-10, 1) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
+              end
+            end
+
+            context 'first offset if 2 offsets is out of the range' do
+              specify do
+                expect { subject.values_at(-10, 100) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
+              end
+            end
+
+            context 'raises IndexError first' do
+              specify do
+                expect { subject.values_at(-10..0, -100) }.to raise_error(IndexError, 'offset -100 too small for factory(size:2)')
+              end
+            end
+          end
+
+          context 'RangeError' do
+            context 'first range value was out of range' do
+              specify do
+                expect { subject.values_at(-10..0) }.to raise_error(RangeError, '-10..0 out of range')
+              end
+            end
+          end
+        end
       end
 
-      context 'errors' do
-        context 'offset out of the range' do
-          specify do
-            expect { subject.values_at(0, 100) }.to raise_error(IndexError, 'offset 100 too large for factory(size:2)')
-          end
-        end
-
-        context 'offset out of the range' do
-          specify do
-            expect { subject.values_at(-10, 1) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
-          end
-        end
-
-        context 'first offset if 2 offsets is out of the range' do
-          specify do
-            expect { subject.values_at(-10, 100) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
-          end
-        end
-
-        context 'first range value was out of range' do
-          specify do
-            expect { subject.values_at(-10..0) }.to raise_error(RangeError, '-10..0 out of range')
-          end
-        end
-
-        context 'IndexError first' do
-          specify do
-            expect { subject.values_at(-10..0, -100) }.to raise_error(IndexError, 'offset -100 too small for factory(size:2)')
-          end
-        end
-      end
+      
     end
   end
 end
