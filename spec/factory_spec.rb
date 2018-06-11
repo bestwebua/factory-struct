@@ -10,26 +10,29 @@ describe Factory do
       let(:without_args)        { Factory.new }
       let(:without_name)        { Factory.new(:a, :b).new }
       let(:with_wrong_keys)     { Factory.new(:a, 1) }
-      let(:with_keys)           { Factory.new(:a, :b).new }
       let(:with_mix_keys)       { Factory.new(:a, 'b').new }
       let(:with_wrong_name)     { Factory.new('wrong_constant') }
       let(:with_name_and_keys)  { @factory_object.new }
+
+      alias_method :with_keys, :without_name
       
       context 'factory object without name' do
         specify do
           expect(without_name.class).to be_an_instance_of(Class)
         end
 
-        it 'should have instance variables based by send keys' do
-          expect(without_name.instance_variables).to eq(%i[@a @b])
-        end
+        context 'have instance variables based by send keys' do
+          specify do
+            expect(without_name.instance_variables).to eq(%i[@a @b])
+          end
 
-        it 'should have instance variables based by send keys' do
-          expect(with_keys.instance_variables).to eq(%i[@a @b])
-        end
+          specify do
+            expect(with_keys.instance_variables).to eq(%i[@a @b])
+          end
 
-        it 'should have instance variables based by send keys' do
-          expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
+          specify do
+            expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
+          end
         end
 
         context 'errors' do
@@ -71,22 +74,23 @@ describe Factory do
     end
 
     describe 'object values' do
-      let(:without_args)                     { @factory_object.new.values.all?(&:nil?) }
-      let(:with_args_less_than_exists_vars)  { @factory_object.new(1).count(&:nil?) }
-      let(:base_case)                        { @factory_object.new(1, 2).values }
-      let(:with_args_equal_vars_by_quantity) { base_case.size }
+      let(:without_args)                     { @factory_object.new }
+      let(:with_args_less_than_exists_vars)  { @factory_object.new(1) }
+      let(:base_case)                        { @factory_object.new(1, 2) }
       let(:with_args_more_vars_by_quantity)  { @factory_object.new(1, 2, 3) }
 
+      alias_method :with_args_equal_vars_by_quantity, :base_case
+
       it 'fill out all values of instance variables with nil' do
-        expect(without_args).to be(true)
+        expect(without_args.values.all?(&:nil?)).to be(true)
       end
 
       it 'fill out all values of instance variables with not passed args with nil' do
-        expect(with_args_less_than_exists_vars).to eq(1)
+        expect(with_args_less_than_exists_vars.count(&:nil?)).to eq(1)
       end
 
       it 'fill out all values of instance variables with all args' do
-        expect(with_args_equal_vars_by_quantity).to eq(2)
+        expect(with_args_equal_vars_by_quantity.size).to eq(2)
       end
 
       context 'passed args more than quantity of defined args' do
@@ -97,7 +101,7 @@ describe Factory do
 
       context 'instance variables values equal all passed args' do
         it 'returns true' do
-          expect(base_case).to eq([1, 2])
+          expect(base_case.values).to eq([1, 2])
         end
       end
     end
