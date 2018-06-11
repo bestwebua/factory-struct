@@ -444,8 +444,6 @@ describe Factory do
           end
         end
       end
-
-      
     end
   end
 end
