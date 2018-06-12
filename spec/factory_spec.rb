@@ -436,24 +436,24 @@ describe Factory do
 
             context 'small offset, out of the range' do
               let(:start_index) { -10 }
-              let(:end_index) { 1 }
-              let(:message) { "offset #{start_index} too small #{size_message}" }
+              let(:end_index)   { 1 }
+              let(:message)     { "offset #{start_index} too small #{size_message}" }
 
               it_behaves_like :raise_appropriate_error
             end
 
             context 'first offset if 2 offsets is out of the range' do
               let(:start_index) { -10 }
-              let(:end_index) { 100 }
-              let(:message) { "offset #{start_index} too small #{size_message}" }
+              let(:end_index)   { 100 }
+              let(:message)     { "offset #{start_index} too small #{size_message}" }
 
               it_behaves_like :raise_appropriate_error
             end
 
             context 'raises IndexError first' do
               let(:start_index) { -10..0 }
-              let(:end_index) { -100 }
-              let(:message) { "offset #{end_index} too small #{size_message}" }
+              let(:end_index)   { -100 }
+              let(:message)     { "offset #{end_index} too small #{size_message}" }
 
               it_behaves_like :raise_appropriate_error
             end
