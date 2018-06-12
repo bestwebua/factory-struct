@@ -8,40 +8,46 @@ describe Factory do
   describe '.new' do
     context 'object keys' do
       let(:without_args)        { Factory.new }
-      let(:without_name)        { Factory.new(:a, :b).new }
+      let(:with_keys)           { Factory.new(:a, :b).new }
       let(:with_wrong_keys)     { Factory.new(:a, 1) }
       let(:with_mix_keys)       { Factory.new(:a, 'b').new }
       let(:with_wrong_name)     { Factory.new('wrong_constant') }
       let(:with_name_and_keys)  { @factory_object.new }
 
-      alias_method :with_keys, :without_name
+      alias_method :without_name, :with_keys
       
       context 'factory object without name' do
         specify do
           expect(without_name.class).to be_an_instance_of(Class)
         end
 
-        context 'have instance variables based by send keys' do
-          specify do
-            expect(without_name.instance_variables).to eq(%i[@a @b])
+        describe 'instance vars initialization' do
+          shared_examples(:init_instance_vars) do
+            specify { expect(instance_vars).to eq(%i[@a @b]) }
           end
 
-          specify do
-            expect(with_keys.instance_variables).to eq(%i[@a @b])
+          context 'with keys' do
+            let(:instance_vars) { with_keys.instance_variables }
+            it_behaves_like(:init_instance_vars)
           end
 
-          specify do
-            expect(with_mix_keys.instance_variables).to eq(%i[@a @b])
+          context 'with mix keys' do
+            let(:instance_vars) { with_mix_keys.instance_variables }
+            it_behaves_like(:init_instance_vars)
           end
         end
 
-        context 'errors' do
-          specify do
-            expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
+        describe 'errors' do
+          context 'ArgumentError' do
+            specify do
+              expect { without_args }.to raise_error(ArgumentError, 'wrong number of arguments (given 0, expected 1+)')
+            end
           end
 
-          specify do
-            expect { with_wrong_keys }.to raise_error(TypeError, '1 is not a symbol nor a string')
+          context 'TypeError' do
+            specify do
+              expect { with_wrong_keys }.to raise_error(TypeError, '1 is not a symbol nor a string')
+            end
           end
         end
       end
@@ -409,37 +415,59 @@ describe Factory do
         end
 
         context 'errors' do
+          shared_examples :raise_appropriate_error do
+            specify do
+              expect { subject.values_at(start_index, end_index) }.to raise_error(error_class, message)
+            end
+          end
+
+          let(:size_message) { "for factory(size:#{subject.size})" }
+
           context 'IndexError' do
+            let(:error_class) { IndexError }
+
             context 'large offset, out of the range' do
-              specify do
-                expect { subject.values_at(0, 100) }.to raise_error(IndexError, 'offset 100 too large for factory(size:2)')
-              end
+              let(:start_index) { 0 }
+              let(:end_index)   { 100 }
+              let(:message)     { "offset #{end_index} too large #{size_message}" }
+
+              it_behaves_like(:raise_appropriate_error)
             end
 
             context 'small offset, out of the range' do
-              specify do
-                expect { subject.values_at(-10, 1) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
-              end
+              let(:start_index) { -10 }
+              let(:end_index) { 1 }
+              let(:message) { "offset #{start_index} too small #{size_message}" }
+
+              it_behaves_like :raise_appropriate_error
             end
 
             context 'first offset if 2 offsets is out of the range' do
-              specify do
-                expect { subject.values_at(-10, 100) }.to raise_error(IndexError, 'offset -10 too small for factory(size:2)')
-              end
+              let(:start_index) { -10 }
+              let(:end_index) { 100 }
+              let(:message) { "offset #{start_index} too small #{size_message}" }
+
+              it_behaves_like :raise_appropriate_error
             end
 
             context 'raises IndexError first' do
-              specify do
-                expect { subject.values_at(-10..0, -100) }.to raise_error(IndexError, 'offset -100 too small for factory(size:2)')
-              end
+              let(:start_index) { -10..0 }
+              let(:end_index) { -100 }
+              let(:message) { "offset #{end_index} too small #{size_message}" }
+
+              it_behaves_like :raise_appropriate_error
             end
           end
 
           context 'RangeError' do
+            let(:error_class) { RangeError }
+
             context 'first range value was out of range' do
-              specify do
-                expect { subject.values_at(-10..0) }.to raise_error(RangeError, '-10..0 out of range')
-              end
+              let(:start_index) { -10..0 }
+              let(:end_index) { 0 }
+              let(:message) { "#{start_index} out of range" }
+
+              it_behaves_like :raise_appropriate_error
             end
           end
         end
