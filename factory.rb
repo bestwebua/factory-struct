@@ -11,11 +11,10 @@ class Factory
     constant = args[0].a_const? ? args[0] : nil
     class_args = constant ? args[1..-1] : args
 
-    case
-      when args.empty?
-        raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'
-      when args.size > 1
-        raise TypeError, "#{class_args[0]} is not a symbol nor a string" if class_args.all? { |i| !i.is_a?(Symbol) }
+    if args.empty?
+      raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'
+    elsif args.size > 1 && class_args.all? { |item| !item.is_a?(Symbol) }
+      raise TypeError, "#{class_args[0]} is not a symbol nor a string"
     end
 
     subclass = Class.new self do
