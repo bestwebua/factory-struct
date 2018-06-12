@@ -40,11 +40,11 @@ class Factory
     end
   end
 
-  def == (other)
+  def ==(other)
     self.class == other.class && self.values == other.values
   end
 
-  def [] (arg)
+  def [](arg)
     if arg.is_a?(Integer)
       index_error = "offset #{arg} too large for #{class_name}(size:#{self.size})"
       raise IndexError, index_error unless arg.between?(0, members.size-1)
@@ -56,7 +56,7 @@ class Factory
     end
   end
 
-  def []= (arg, value)
+  def []=(arg, value)
     self[arg]
       attribute = if arg.is_a?(Integer)
         :"#{members[arg].to_s.insert(0, '@')}"
@@ -66,22 +66,22 @@ class Factory
     instance_variable_set(attribute, value)
   end
 
-  def dig (*args)
+  def dig(*args)
     to_h.dig(*args)
   end
 
-  def each (&block)
+  def each(&block)
     return enum_for(:each) unless block
     members.each { |attribute| block.call(send(attribute)) }
     self
   end
 
-  def each_pair (&block)
+  def each_pair(&block)
     return enum_for(:each) unless block
     to_h.each_pair(&block)
   end
 
-  def eql? (other)
+  def eql?(other)
     self.class == other.class && (self.values).eql?(other.values)
   end
 
@@ -103,7 +103,7 @@ class Factory
     instance_variables.map { |instance_var| :"#{instance_var.to_s.delete('@')}" }
   end
 
-  def select (&block)
+  def select(&block)
     return enum_for(:select) unless block
     values.select(&block)
   end
@@ -116,7 +116,7 @@ class Factory
     members.map { |attribute| send(attribute) }
   end
 
-  def values_at (*args)
+  def values_at(*args)
     args.select { |arg| arg.is_a?(Integer) }.each do |arg|
       error = case
         when arg < -values.size then "offset #{arg} too small"
