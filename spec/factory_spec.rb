@@ -370,7 +370,7 @@ describe Factory do
 
     describe '#values_at' do
       context 'arguments' do
-        context 'nubers' do
+        context 'numbers' do
           specify do
             expect(subject.values_at).to be_an_instance_of(Array)
           end
