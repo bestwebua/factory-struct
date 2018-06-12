@@ -9,7 +9,7 @@ class Factory
 
   def self.new(*args)
     constant = args[0].a_const? ? args[0] : nil
-    class_args = constant.nil? ? args : args[1..-1]
+    class_args = constant ? args[1..-1] : args
 
     case
       when args.empty?
@@ -35,7 +35,7 @@ class Factory
     end
 
     begin
-      constant.nil? ? subclass : const_set(constant, subclass)
+      constant ? const_set(constant, subclass) : subclass
     rescue
       raise NameError, "identifier #{args[0]} needs to be constant"
     end
